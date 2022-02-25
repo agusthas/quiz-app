@@ -9,7 +9,7 @@
     "react/jsx-key": [0], // TODO: remove this if nextjs ever upgrade from canary
 
     // I suggest you add those two rules:
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": "error"
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn"
   }
 }
