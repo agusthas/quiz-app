@@ -1,3 +1,6 @@
+import { useState } from "react";
+import useFetch from "../hooks/useFetch";
+
 function SVGDivider() {
   return (
     <svg width="295" height="16" xmlns="http://www.w3.org/2000/svg">
@@ -28,20 +31,21 @@ function Question({ count, question }: { count: number; question: string }) {
 
 function Answers({
   answers,
+  correctAnswer,
   handleClick,
 }: {
   answers: string[];
-  handleClick: () => void;
+  correctAnswer: string;
+  handleClick: (isCorrect: boolean) => () => void;
 }) {
-  console.log(answers);
   return (
     <div className="mt-8 grid grid-cols-2 gap-4">
       {answers.map((ans, i) => (
         <button
           key={i}
           type="button"
-          onClick={handleClick}
-          className="rounded-lg border border-green-100 px-5 py-2.5 text-center font-medium tracking-wide text-green-100 hover:border-green-400 hover:bg-green-400 hover:text-gray-800 focus:ring-4 focus:ring-green-200"
+          onClick={handleClick(ans === correctAnswer)}
+          className="rounded-lg border border-green-100 px-5 py-2.5 text-center font-medium tracking-wide text-green-100 hover:border-green-400 hover:bg-green-400 hover:text-gray-800"
           dangerouslySetInnerHTML={{ __html: ans }}
         ></button>
       ))}
@@ -49,26 +53,60 @@ function Answers({
   );
 }
 
+interface APIResponse {
+  response_code: number;
+  results: Question[];
+}
+
+interface Question {
+  question: string;
+  correct_answer: string;
+  incorrect_answers: string[];
+}
+
 export default function Quiz() {
-  return (
+  const { data, error } = useFetch<APIResponse>(
+    "https://opentdb.com/api.php?amount=5"
+  );
+  const [currentCount, setCurrentCount] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [score, setScore] = useState(0);
+
+  if (!data) {
+    return <div>Loading</div>;
+  }
+
+  if (error) {
+    return <div>Error</div>;
+  }
+
+  const { question, correct_answer, incorrect_answers } =
+    data.results[currentCount];
+
+  const handleClick = (isCorrect: boolean) => () => {
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+
+    if (currentCount < data.results.length - 1) {
+      setCurrentCount(currentCount + 1);
+    } else {
+      setShowResult(true);
+    }
+  };
+
+  return showResult ? (
+    <div className="bg-gray-600 text-white">Score: {score}</div>
+  ) : (
     <div className="flex max-w-[600px] flex-col rounded-lg bg-gray-600 py-10 px-4 text-center shadow-2xl sm:px-10">
-      <Question
-        count={0}
-        question={
-          "How many legs is it biologically impossible for a centipede to have?"
-        }
-      />
+      <Question count={currentCount} question={question} />
       <div className="mt-6 flex items-center justify-center">
         <SVGDivider />
       </div>
       <Answers
-        answers={[
-          "Alex Mercer",
-          "Dana Mercer",
-          "Any Goliaths roaming around",
-          "James Heller",
-        ]}
-        handleClick={() => alert("clicked")}
+        answers={[correct_answer, ...incorrect_answers]}
+        correctAnswer={correct_answer}
+        handleClick={handleClick}
       />
     </div>
   );
