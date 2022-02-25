@@ -1,3 +1,6 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "react/jsx-key": [0] // TODO: remove this if nextjs ever upgrade from canary
+  }
 }
