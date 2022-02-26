@@ -24,7 +24,7 @@ function Question({ count, question }: { count: number; question: string }) {
   return (
     <div className="text-center font-extrabold">
       <h2 className="text-sm uppercase tracking-[0.35rem] text-green-400">
-        Question #{count + 1}
+        Question #{count}
       </h2>
       <p className="mt-6 text-2xl leading-snug text-green-100 sm:text-[1.75rem]">
         {decodeHtml(question)}
@@ -83,6 +83,7 @@ export default function Quiz() {
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
 
+  // TODO: this can be made into its own components
   const { seconds, minutes } = useTimer({
     expiryTimestamp: (() => {
       const time = new Date();
@@ -138,7 +139,7 @@ export default function Quiz() {
         {minutes}m {seconds}s
       </p>
       <div className="mt-4 flex max-w-[600px] flex-col rounded-lg bg-gray-600 py-10 px-4 text-center shadow-2xl sm:px-10">
-        <Question count={currentCount} question={question} />
+        <Question count={currentCount + 1} question={question} />
         <div className="mt-6 flex items-center justify-center">
           <SVGDivider />
         </div>
