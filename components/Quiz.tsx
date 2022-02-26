@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTimer } from "react-timer-hook";
 import useFetch from "../hooks/useFetch";
 import decodeHtml from "../utils/decodeHtml";
 import QuizResult from "./QuizResult";
@@ -74,6 +75,17 @@ export default function Quiz() {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
 
+  const { seconds, minutes } = useTimer({
+    expiryTimestamp: (() => {
+      const time = new Date();
+      time.setSeconds(time.getSeconds() + 10);
+      return time;
+    })(),
+    onExpire: () => {
+      setShowResult(true);
+    },
+  });
+
   if (error) {
     return <div className="text-9xl uppercase text-red-400">Error</div>;
   }
@@ -110,16 +122,21 @@ export default function Quiz() {
       answered={currentCount + 1}
     />
   ) : (
-    <div className="flex max-w-[600px] flex-col rounded-lg bg-gray-600 py-10 px-4 text-center shadow-2xl sm:px-10">
-      <Question count={currentCount} question={question} />
-      <div className="mt-6 flex items-center justify-center">
-        <SVGDivider />
+    <>
+      <p className="rounded-lg bg-gray-700 py-1 px-4 text-2xl font-bold tracking-wider text-green-400">
+        {minutes}m {seconds}s
+      </p>
+      <div className="mt-4 flex max-w-[600px] flex-col rounded-lg bg-gray-600 py-10 px-4 text-center shadow-2xl sm:px-10">
+        <Question count={currentCount} question={question} />
+        <div className="mt-6 flex items-center justify-center">
+          <SVGDivider />
+        </div>
+        <Answers
+          answers={[correct_answer, ...incorrect_answers]}
+          correctAnswer={correct_answer}
+          handleClick={handleClick}
+        />
       </div>
-      <Answers
-        answers={[correct_answer, ...incorrect_answers]}
-        correctAnswer={correct_answer}
-        handleClick={handleClick}
-      />
-    </div>
+    </>
   );
 }
