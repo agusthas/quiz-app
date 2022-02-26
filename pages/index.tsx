@@ -1,9 +1,16 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useState } from "react";
 import Layout from "../components/Layout";
 import Quiz from "../components/Quiz";
+import { QuizContext } from "../contexts/QuizContext";
 
 const Home: NextPage = () => {
+  const [show, setShow] = useState(false);
+  const toggleShow = () => {
+    setShow(!show);
+  };
+
   return (
     <Layout>
       <Head>
@@ -13,7 +20,24 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="flex flex-1 items-center justify-center p-4 font-sans">
-        <Quiz />
+        <QuizContext.Provider
+          value={{
+            show,
+            toggleShow,
+          }}
+        >
+          {show ? (
+            <Quiz />
+          ) : (
+            <button
+              onClick={toggleShow}
+              type="button"
+              className="rounded-lg border border-green-100 px-5 py-2.5 text-center font-medium tracking-wide text-green-100 hover:border-green-400 hover:bg-green-400 hover:text-gray-800"
+            >
+              Start Quiz
+            </button>
+          )}
+        </QuizContext.Provider>
       </main>
     </Layout>
   );

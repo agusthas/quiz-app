@@ -68,18 +68,24 @@ interface Question {
 
 export default function Quiz() {
   const { data, error } = useFetch<APIResponse>(
-    "https://opentdb.com/api.php?amount=5"
+    "https://opentdb.com/api.php?amount=10"
   );
   const [currentCount, setCurrentCount] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
 
-  if (!data) {
-    return <div>Loading</div>;
+  if (error) {
+    return <div className="text-9xl uppercase text-red-400">Error</div>;
   }
 
-  if (error) {
-    return <div>Error</div>;
+  if (!data) {
+    return (
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-400 border-t-transparent"></div>
+    );
+  }
+
+  if (data.response_code !== 0) {
+    return <div className="text-9xl uppercase text-red-400">Error</div>;
   }
 
   const { question, correct_answer, incorrect_answers } =
@@ -98,7 +104,11 @@ export default function Quiz() {
   };
 
   return showResult ? (
-    <div className="bg-gray-600 text-white">Score: {score}</div>
+    <QuizResult
+      correct={score}
+      incorrect={currentCount + 1 - score}
+      answered={currentCount + 1}
+    />
   ) : (
     <div className="flex max-w-[600px] flex-col rounded-lg bg-gray-600 py-10 px-4 text-center shadow-2xl sm:px-10">
       <Question count={currentCount} question={question} />
