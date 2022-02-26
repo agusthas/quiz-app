@@ -19,7 +19,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-1 items-center justify-center p-4 font-sans">
+      <main className="flex flex-1 flex-col items-center justify-center p-4 font-sans">
         <QuizContext.Provider
           value={{
             show,
