@@ -74,6 +74,7 @@ export default function Quiz() {
   const [currentCount, setCurrentCount] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
+  const [answered, setAnswered] = useState(0);
 
   const { seconds, minutes } = useTimer({
     expiryTimestamp: (() => {
@@ -106,6 +107,9 @@ export default function Quiz() {
   const handleClick = (isCorrect: boolean) => () => {
     if (isCorrect) {
       setScore(score + 1);
+      setAnswered(answered + 1);
+    } else {
+      setAnswered(answered + 1);
     }
 
     if (currentCount < data.results.length - 1) {
@@ -118,8 +122,8 @@ export default function Quiz() {
   return showResult ? (
     <QuizResult
       correct={score}
-      incorrect={currentCount + 1 - score}
-      answered={currentCount + 1}
+      answered={answered}
+      incorrect={answered - score}
     />
   ) : (
     <>
