@@ -1,7 +1,9 @@
-import { useState } from "react";
+// TODO: Refactoring
+import { useMemo, useState } from "react";
 import { useTimer } from "react-timer-hook";
 import useFetch from "../hooks/useFetch";
 import decodeHtml from "../utils/decodeHtml";
+import shuffle from "../utils/shuffle";
 import QuizResult from "./QuizResult";
 
 function SVGDivider() {
@@ -35,14 +37,19 @@ function Answers({
   answers,
   correctAnswer,
   handleClick,
+  currentCount,
 }: {
   answers: string[];
+  currentCount: number;
   correctAnswer: string;
   handleClick: (isCorrect: boolean) => () => void;
 }) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const ansMemo = useMemo(() => shuffle(answers), [currentCount]);
+
   return (
     <div className="mt-8 grid grid-cols-2 gap-4">
-      {answers.map((ans, i) => (
+      {ansMemo.map((ans, i) => (
         <button
           key={i}
           type="button"
@@ -139,6 +146,7 @@ export default function Quiz() {
           answers={[correct_answer, ...incorrect_answers]}
           correctAnswer={correct_answer}
           handleClick={handleClick}
+          currentCount={currentCount}
         />
       </div>
     </>
