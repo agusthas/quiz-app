@@ -1,5 +1,7 @@
 import { useState } from "react";
 import useFetch from "../hooks/useFetch";
+import decodeHtml from "../utils/decodeHtml";
+import QuizResult from "./QuizResult";
 
 function SVGDivider() {
   return (
@@ -21,10 +23,9 @@ function Question({ count, question }: { count: number; question: string }) {
       <h2 className="text-sm uppercase tracking-[0.35rem] text-green-400">
         Question #{count + 1}
       </h2>
-      <p
-        className="mt-6 text-2xl leading-snug text-green-100 sm:text-[1.75rem]"
-        dangerouslySetInnerHTML={{ __html: question }}
-      ></p>
+      <p className="mt-6 text-2xl leading-snug text-green-100 sm:text-[1.75rem]">
+        {decodeHtml(question)}
+      </p>
     </div>
   );
 }
@@ -46,8 +47,9 @@ function Answers({
           type="button"
           onClick={handleClick(ans === correctAnswer)}
           className="rounded-lg border border-green-100 px-5 py-2.5 text-center font-medium tracking-wide text-green-100 hover:border-green-400 hover:bg-green-400 hover:text-gray-800"
-          dangerouslySetInnerHTML={{ __html: ans }}
-        ></button>
+        >
+          {decodeHtml(ans)}
+        </button>
       ))}
     </div>
   );
