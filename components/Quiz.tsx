@@ -87,7 +87,7 @@ export default function Quiz() {
   const { seconds, minutes } = useTimer({
     expiryTimestamp: (() => {
       const time = new Date();
-      time.setSeconds(time.getSeconds() + 10);
+      time.setSeconds(time.getSeconds() + 60);
       return time;
     })(),
     onExpire: () => {
