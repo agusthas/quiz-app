@@ -50,7 +50,12 @@ const Home: NextPage = () => {
         {username && (
           <div className="absolute top-0 mt-2 mr-2 flex items-center justify-center gap-4 rounded-md bg-gray-700 px-3 py-2">
             <p className="text-center text-xl text-green-400">👤 {username}</p>
-            <button className="text-center text-xl text-red-400">❌</button>
+            <button
+              className="text-center text-xl text-red-400"
+              onClick={() => setUsername("")}
+            >
+              ❌
+            </button>
           </div>
         )}
 
