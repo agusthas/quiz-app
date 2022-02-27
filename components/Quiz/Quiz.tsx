@@ -1,11 +1,14 @@
 // TODO: Refactoring
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTimer } from "react-timer-hook";
-import { useQuiz } from "../contexts/QuizContext";
-import decodeHtml from "../utils/decodeHtml";
-import shuffle from "../utils/shuffle";
+import { useQuiz } from "../../contexts/QuizContext";
 import QuizResult from "./QuizResult";
-import { APIResponse } from "../types/quiz";
+import { APIResponse } from "../../types/quiz";
+import { QuizAnswers } from "./QuizAnswers";
+import { QuizQuestion } from "./QuizQuestion";
+import Loading from "../Loading";
+import Error from "../Error";
+import { fetcher } from "../../utils/fetcher";
 
 function SVGDivider() {
   return (
@@ -21,50 +24,7 @@ function SVGDivider() {
   );
 }
 
-function Question({ count, question }: { count: number; question: string }) {
-  return (
-    <div className="text-center font-extrabold">
-      <h2 className="text-sm uppercase tracking-[0.35rem] text-green-400">
-        Question #{count}
-      </h2>
-      <p className="mt-6 text-2xl leading-snug text-green-100 sm:text-[1.75rem]">
-        {decodeHtml(question)}
-      </p>
-    </div>
-  );
-}
-
-function Answers({
-  answers,
-  correctAnswer,
-  handleClick,
-  currentCount,
-}: {
-  answers: string[];
-  currentCount: number;
-  correctAnswer: string;
-  handleClick: (isCorrect: boolean) => () => void;
-}) {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const ansMemo = useMemo(() => shuffle(answers), [currentCount]);
-
-  return (
-    <div className="mt-8 grid grid-cols-2 gap-4">
-      {ansMemo.map((ans, i) => (
-        <button
-          key={i}
-          type="button"
-          onClick={handleClick(ans === correctAnswer)}
-          className="rounded-lg border border-green-100 px-5 py-2.5 text-center font-medium tracking-wide text-green-100 hover:border-green-400 hover:bg-green-400 hover:text-gray-800"
-        >
-          {decodeHtml(ans)}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-export default function Quiz() {
+export default function Quiz({ toggleShow }: { toggleShow: () => void }) {
   const [showResult, setShowResult] = useState(false);
   const {
     currentCount,
@@ -75,14 +35,14 @@ export default function Quiz() {
     setAnswered,
     data,
     setData,
-    toggleShow,
   } = useQuiz();
 
   // fetch
   useEffect(() => {
     async function fetchQuiz() {
-      const response = await fetch("https://opentdb.com/api.php?amount=10");
-      const data = (await response.json()) as APIResponse;
+      const data = await fetcher<APIResponse>(
+        "https://opentdb.com/api.php?amount=10"
+      );
 
       setData(data);
     }
@@ -105,15 +65,9 @@ export default function Quiz() {
     },
   });
 
-  if (!data) {
-    return (
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-400 border-t-transparent"></div>
-    );
-  }
+  if (!data) return <Loading />;
 
-  if (data.response_code !== 0) {
-    return <div className="text-9xl uppercase text-red-400">Error</div>;
-  }
+  if (data.response_code !== 0) return <Error />;
 
   const { question, correct_answer, incorrect_answers } =
     data.results[currentCount];
@@ -134,7 +88,7 @@ export default function Quiz() {
   };
 
   const handleReset = () => {
-    toggleShow && toggleShow();
+    toggleShow();
     setCurrentCount(0);
     setScore(0);
     setAnswered(0);
@@ -154,11 +108,11 @@ export default function Quiz() {
         {minutes}m {seconds}s
       </p>
       <div className="mt-4 flex max-w-[600px] flex-col rounded-lg bg-gray-600 py-10 px-4 text-center shadow-2xl sm:px-10">
-        <Question count={currentCount + 1} question={question} />
+        <QuizQuestion count={currentCount + 1} question={question} />
         <div className="mt-6 flex items-center justify-center">
           <SVGDivider />
         </div>
-        <Answers
+        <QuizAnswers
           answers={[correct_answer, ...incorrect_answers]}
           correctAnswer={correct_answer}
           handleClick={handleClick}

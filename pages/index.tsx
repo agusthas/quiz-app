@@ -1,4 +1,4 @@
-// TODO: username di sebarin ke anak2 via context
+// FIXME: User logout -> clear localStorage
 // TODO: User bisa lanjut kerjain quiz
 // TODO: Refactoring
 import type { NextPage } from "next";
@@ -6,7 +6,7 @@ import Head from "next/head";
 import React from "react";
 import Form from "../components/Form";
 import Header from "../components/Header";
-import QuizScreen from "../components/QuizScreen";
+import QuizScreen from "../components/Quiz/QuizScreen";
 import useLocalStorage from "../hooks/useLocalStorage";
 
 const Home: NextPage = () => {
