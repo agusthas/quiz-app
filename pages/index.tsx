@@ -10,7 +10,11 @@ import Quiz from "../components/Quiz";
 import { QuizContext } from "../contexts/QuizContext";
 import useLocalStorage from "../hooks/useLocalStorage";
 
-function LoginButton({ toggleQuizScreen }: { toggleQuizScreen: () => void }) {
+function StartQuizButton({
+  toggleQuizScreen,
+}: {
+  toggleQuizScreen: () => void;
+}) {
   return (
     <button
       onClick={toggleQuizScreen}
@@ -69,7 +73,7 @@ const Home: NextPage = () => {
             {showQuizScreen ? (
               <Quiz />
             ) : (
-              <LoginButton toggleQuizScreen={toggleQuizScreen} />
+              <StartQuizButton toggleQuizScreen={toggleQuizScreen} />
             )}
           </QuizContext.Provider>
         ) : (
