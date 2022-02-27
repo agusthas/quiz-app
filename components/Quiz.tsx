@@ -1,10 +1,11 @@
 // TODO: Refactoring
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTimer } from "react-timer-hook";
-import useFetch from "../hooks/useFetch";
+import { useQuiz } from "../contexts/QuizContext";
 import decodeHtml from "../utils/decodeHtml";
 import shuffle from "../utils/shuffle";
 import QuizResult from "./QuizResult";
+import { APIResponse } from "../types/quiz";
 
 function SVGDivider() {
   return (
@@ -63,25 +64,34 @@ function Answers({
   );
 }
 
-interface APIResponse {
-  response_code: number;
-  results: Question[];
-}
-
-interface Question {
-  question: string;
-  correct_answer: string;
-  incorrect_answers: string[];
-}
-
 export default function Quiz() {
-  const { data, error } = useFetch<APIResponse>(
-    "https://opentdb.com/api.php?amount=10"
-  );
-  const [currentCount, setCurrentCount] = useState(0);
   const [showResult, setShowResult] = useState(false);
-  const [score, setScore] = useState(0);
-  const [answered, setAnswered] = useState(0);
+  const {
+    currentCount,
+    setCurrentCount,
+    score,
+    setScore,
+    answered,
+    setAnswered,
+    data,
+    setData,
+    toggleShow,
+  } = useQuiz();
+
+  // fetch
+  useEffect(() => {
+    async function fetchQuiz() {
+      const response = await fetch("https://opentdb.com/api.php?amount=10");
+      const data = (await response.json()) as APIResponse;
+
+      setData(data);
+    }
+
+    if (!data) {
+      void fetchQuiz();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   // TODO: this can be made into its own components
   const { seconds, minutes } = useTimer({
@@ -94,10 +104,6 @@ export default function Quiz() {
       setShowResult(true);
     },
   });
-
-  if (error) {
-    return <div className="text-9xl uppercase text-red-400">Error</div>;
-  }
 
   if (!data) {
     return (
@@ -127,11 +133,20 @@ export default function Quiz() {
     }
   };
 
+  const handleReset = () => {
+    toggleShow && toggleShow();
+    setCurrentCount(0);
+    setScore(0);
+    setAnswered(0);
+    setData(null);
+  };
+
   return showResult ? (
     <QuizResult
       correct={score}
       answered={answered}
       incorrect={answered - score}
+      reset={handleReset}
     />
   ) : (
     <>

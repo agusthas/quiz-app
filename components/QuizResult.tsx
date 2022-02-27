@@ -1,9 +1,6 @@
-import { useQuiz } from "../contexts/QuizContext";
 import decodeHtml from "../utils/decodeHtml";
 
-function Reaction({ score }: { score: number }) {
-  const { toggleShow } = useQuiz();
-
+function Reaction({ score, reset }: { score: number; reset: () => void }) {
   const scoreInRange = <T extends number>(min: T, max: T) =>
     (score - min) * (score - max) <= 0;
 
@@ -29,7 +26,7 @@ function Reaction({ score }: { score: number }) {
       </div>
       <button
         type="button"
-        onClick={toggleShow}
+        onClick={reset}
         className="peer rounded-lg border border-green-100 px-5 py-2.5 text-center font-medium tracking-wide text-green-100 hover:border-green-400 hover:bg-green-400 hover:text-gray-800"
       >
         {isPerfect ? "Back to start" : "Try Again"}
@@ -71,9 +68,15 @@ type Props = {
   correct: number;
   incorrect: number;
   answered: number;
+  reset: () => void;
 };
 
-export default function QuizResult({ correct, incorrect, answered }: Props) {
+export default function QuizResult({
+  correct,
+  incorrect,
+  answered,
+  reset,
+}: Props) {
   const score = +((correct / answered) * 100).toFixed(2); // i'm not that good with math
 
   return (
@@ -84,7 +87,7 @@ export default function QuizResult({ correct, incorrect, answered }: Props) {
         answered, you got
       </p>
       <Scores correct={correct} incorrect={incorrect} />
-      <Reaction score={score} />
+      <Reaction score={score} reset={reset} />
     </div>
   );
 }

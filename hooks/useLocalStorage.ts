@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-
-type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
+import { SetState } from "../types/setState";
 
 const useLocalStorage = <T>(key: string, initialValue: T): [T, SetState<T>] => {
   const getValue = useCallback((): T => {

@@ -9,6 +9,7 @@ import Header from "../components/Header";
 import Quiz from "../components/Quiz";
 import { QuizContext } from "../contexts/QuizContext";
 import useLocalStorage from "../hooks/useLocalStorage";
+import { APIResponse } from "../types/quiz";
 
 function StartQuizButton({
   toggleQuizScreen,
@@ -32,6 +33,10 @@ const Home: NextPage = () => {
   const toggleQuizScreen = () => {
     setShowQuizScreen(!showQuizScreen);
   };
+  const [currentCount, setCurrentCount] = useLocalStorage("currentCount", 0);
+  const [score, setScore] = useLocalStorage("score", 0);
+  const [answered, setAnswered] = useLocalStorage("answered", 0);
+  const [data, setData] = useLocalStorage<APIResponse | null>("quiz", null);
 
   const handleSubmit = (name: string) => (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -68,6 +73,14 @@ const Home: NextPage = () => {
             value={{
               show: showQuizScreen,
               toggleShow: toggleQuizScreen,
+              currentCount,
+              setCurrentCount,
+              answered,
+              setAnswered,
+              score,
+              setScore,
+              data,
+              setData,
             }}
           >
             {showQuizScreen ? (
