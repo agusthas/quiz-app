@@ -3,40 +3,14 @@
 // TODO: Refactoring
 import type { NextPage } from "next";
 import Head from "next/head";
-import React, { useState } from "react";
+import React from "react";
 import Form from "../components/Form";
 import Header from "../components/Header";
-import Quiz from "../components/Quiz";
-import { QuizContext } from "../contexts/QuizContext";
+import QuizScreen from "../components/QuizScreen";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { APIResponse } from "../types/quiz";
-
-function StartQuizButton({
-  toggleQuizScreen,
-}: {
-  toggleQuizScreen: () => void;
-}) {
-  return (
-    <button
-      onClick={toggleQuizScreen}
-      type="button"
-      className="rounded-lg border border-green-100 px-5 py-2.5 text-center font-medium tracking-wide text-green-100 hover:border-green-400 hover:bg-green-400 hover:text-gray-800"
-    >
-      Start Quiz
-    </button>
-  );
-}
 
 const Home: NextPage = () => {
   const [username, setUsername] = useLocalStorage("username", "");
-  const [showQuizScreen, setShowQuizScreen] = useState(false);
-  const toggleQuizScreen = () => {
-    setShowQuizScreen(!showQuizScreen);
-  };
-  const [currentCount, setCurrentCount] = useLocalStorage("currentCount", 0);
-  const [score, setScore] = useLocalStorage("score", 0);
-  const [answered, setAnswered] = useLocalStorage("answered", 0);
-  const [data, setData] = useLocalStorage<APIResponse | null>("quiz", null);
 
   const handleSubmit = (name: string) => (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -68,30 +42,7 @@ const Home: NextPage = () => {
           </div>
         )}
 
-        {username ? (
-          <QuizContext.Provider
-            value={{
-              show: showQuizScreen,
-              toggleShow: toggleQuizScreen,
-              currentCount,
-              setCurrentCount,
-              answered,
-              setAnswered,
-              score,
-              setScore,
-              data,
-              setData,
-            }}
-          >
-            {showQuizScreen ? (
-              <Quiz />
-            ) : (
-              <StartQuizButton toggleQuizScreen={toggleQuizScreen} />
-            )}
-          </QuizContext.Provider>
-        ) : (
-          <Form handleSubmit={handleSubmit} />
-        )}
+        {username ? <QuizScreen /> : <Form handleSubmit={handleSubmit} />}
       </main>
     </div>
   );
