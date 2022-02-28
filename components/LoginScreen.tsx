@@ -4,7 +4,7 @@ type Props = {
   handleSubmit: (n: string) => (e: React.SyntheticEvent) => void;
 };
 
-export default function Form({ handleSubmit }: Props) {
+export default function LoginScreen({ handleSubmit }: Props) {
   const [name, setName] = useState("");
   const [showButton, setShowButton] = useState(false);
 

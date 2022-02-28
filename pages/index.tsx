@@ -1,10 +1,8 @@
-// TODO: Refactoring
 import type { NextPage } from "next";
 import Head from "next/head";
 import React, { useEffect } from "react";
-import Form from "../components/Form";
-import Header from "../components/Header";
-import QuizScreen from "../components/Quiz/QuizScreen";
+import LoginScreen from "../components/LoginScreen";
+import QuizScreen from "../components/QuizScreen";
 import useLocalStorage from "../hooks/useLocalStorage";
 
 const Home: NextPage = () => {
@@ -13,15 +11,11 @@ const Home: NextPage = () => {
   const handleSubmit = (name: string) => (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    if (name.length > 2) {
-      setUsername(name);
-    }
+    name.length > 2 && setUsername(name);
   };
 
   useEffect(() => {
-    if (!username) {
-      localStorage.clear();
-    }
+    !username && localStorage.clear();
   }, [username]);
 
   return (
@@ -32,7 +26,14 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Header />
+      {/* Header */}
+      <header className="bg-gray-600 p-5">
+        <h1 className="text-center text-3xl font-extrabold text-green-100">
+          Quiz App
+        </h1>
+      </header>
+
+      {/* Main */}
       <main className="relative flex flex-1 flex-col items-center justify-center  p-4 font-sans">
         {username && (
           <div className="absolute top-0 mt-2 mr-2 flex items-center justify-center gap-4 rounded-md bg-gray-700 px-3 py-2">
@@ -46,7 +47,11 @@ const Home: NextPage = () => {
           </div>
         )}
 
-        {username ? <QuizScreen /> : <Form handleSubmit={handleSubmit} />}
+        {username ? (
+          <QuizScreen />
+        ) : (
+          <LoginScreen handleSubmit={handleSubmit} />
+        )}
       </main>
     </div>
   );
