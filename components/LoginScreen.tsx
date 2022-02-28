@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type Props = {
   handleSubmit: (n: string) => (e: React.SyntheticEvent) => void;
@@ -6,15 +6,10 @@ type Props = {
 
 export default function LoginScreen({ handleSubmit }: Props) {
   const [name, setName] = useState("");
-  const [showButton, setShowButton] = useState(false);
-
-  useEffect(() => {
-    name.length > 2 ? setShowButton(true) : setShowButton(false);
-  }, [name]);
 
   return (
     <form
-      className="flex items-center justify-center rounded-lg bg-gray-600 p-4 text-green-100"
+      className="flex flex-col items-center justify-center gap-4 rounded-lg bg-gray-600 p-4 text-green-100 sm:flex-row"
       onSubmit={handleSubmit(name)}
     >
       <div>
@@ -31,11 +26,7 @@ export default function LoginScreen({ handleSubmit }: Props) {
       </div>
       <button
         type="submit"
-        className={`${
-          showButton
-            ? "ml-5 max-w-[10em] rounded-lg border border-green-100 px-5 py-2.5"
-            : "max-w-0"
-        } overflow-hidden text-center tracking-wide text-green-100 transition-all duration-300 hover:border-green-400 hover:bg-green-400 hover:text-gray-800`}
+        className="rounded-lg border border-green-100 px-5 py-2.5 text-center tracking-wide text-green-100 hover:border-green-400 hover:bg-green-400 hover:text-gray-800"
       >
         Login
       </button>

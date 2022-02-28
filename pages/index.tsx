@@ -11,7 +11,7 @@ const Home: NextPage = () => {
   const handleSubmit = (name: string) => (e: React.SyntheticEvent) => {
     e.preventDefault();
 
-    name.length > 2 && setUsername(name);
+    name && setUsername(name);
   };
 
   useEffect(() => {
