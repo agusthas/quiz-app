@@ -105,7 +105,11 @@ export default function Quiz({
     <>
       <QuizTimer seconds={timer.seconds} minutes={timer.minutes} />
       <div className="mt-4 flex max-w-[600px] flex-col rounded-lg bg-gray-600 py-10 px-4 text-center shadow-2xl sm:px-10">
-        <QuizQuestion count={quiz.currentCount + 1} question={question} />
+        <QuizQuestion
+          count={quiz.currentCount + 1}
+          question={question}
+          totalQuestion={quiz.data.results.length}
+        />
         <SVGDivider />
         <QuizAnswers
           answers={[correct_answer, ...incorrect_answers]}
