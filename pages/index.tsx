@@ -27,16 +27,12 @@ const Home: NextPage = () => {
       </Head>
 
       {/* Header */}
-      <header className="bg-gray-600 p-5">
+      <header className="flex flex-col items-center justify-center gap-2 bg-gray-600 p-5">
         <h1 className="text-center text-3xl font-extrabold text-green-100">
           Quiz App
         </h1>
-      </header>
-
-      {/* Main */}
-      <main className="relative flex flex-1 flex-col items-center justify-center  p-4 font-sans">
         {username && (
-          <div className="absolute top-0 mt-2 mr-2 flex items-center justify-center gap-4 rounded-md bg-gray-700 px-3 py-2">
+          <div className="flex items-center justify-center gap-4 rounded-md bg-gray-700 px-3 py-2">
             <p className="text-center text-xl text-green-400">👤 {username}</p>
             <button
               className="text-center text-xl text-red-400"
@@ -46,7 +42,10 @@ const Home: NextPage = () => {
             </button>
           </div>
         )}
+      </header>
 
+      {/* Main */}
+      <main className="flex flex-1 flex-col items-center justify-center  p-4 font-sans">
         {username ? (
           <QuizScreen />
         ) : (
