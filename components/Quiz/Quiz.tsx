@@ -1,14 +1,13 @@
 // TODO: Refactoring
 import { useEffect, useState } from "react";
-import { useTimer } from "react-timer-hook";
-import { useQuiz } from "../../contexts/QuizContext";
 import QuizResult from "./QuizResult";
-import { APIResponse } from "../../types/quiz";
 import { QuizAnswers } from "./QuizAnswers";
 import { QuizQuestion } from "./QuizQuestion";
-import Loading from "../Loading";
-import Error from "../Error";
-import { fetcher } from "../../utils/fetcher";
+import { APIResponse } from "../../types/quiz";
+import { SetState } from "../../types/setState";
+import useLocalStorage from "../../hooks/useLocalStorage";
+import { useTimer } from "react-timer-hook";
+import { useQuiz } from "../../contexts/QuizContext";
 
 function SVGDivider() {
   return (
@@ -24,91 +23,88 @@ function SVGDivider() {
   );
 }
 
+const DEFAULT_TIMER = 60; // in seconds
+
 export default function Quiz({ toggleShow }: { toggleShow: () => void }) {
+  const quiz = useQuiz();
   const [showResult, setShowResult] = useState(false);
-  const {
-    currentCount,
-    setCurrentCount,
-    score,
-    setScore,
-    answered,
-    setAnswered,
-    data,
-    setData,
-  } = useQuiz();
+  const [seconds, setSeconds] = useLocalStorage("seconds", DEFAULT_TIMER);
 
-  // fetch
-  useEffect(() => {
-    async function fetchQuiz() {
-      const data = await fetcher<APIResponse>(
-        "https://opentdb.com/api.php?amount=10"
-      );
-
-      setData(data);
-    }
-
-    if (!data) {
-      void fetchQuiz();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
-
-  // TODO: this can be made into its own components
-  const { seconds, minutes } = useTimer({
+  const timer = useTimer({
     expiryTimestamp: (() => {
       const time = new Date();
-      time.setSeconds(time.getSeconds() + 60);
+      time.setSeconds(time.getSeconds() + seconds);
       return time;
     })(),
     onExpire: () => {
       setShowResult(true);
+      setSeconds(DEFAULT_TIMER);
     },
   });
 
-  if (!data) return <Loading />;
+  useEffect(() => {
+    setSeconds(timer.seconds);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timer.seconds]);
 
-  if (data.response_code !== 0) return <Error />;
+  const handleTimerReset = () => {
+    setSeconds(DEFAULT_TIMER);
+    timer.pause();
+  };
+
+  if (!quiz.data) {
+    return (
+      <div className="text-center text-3xl font-extrabold text-red-400">
+        When am i called?
+      </div>
+    );
+  }
 
   const { question, correct_answer, incorrect_answers } =
-    data.results[currentCount];
+    quiz.data.results[quiz.currentCount];
 
   const handleClick = (isCorrect: boolean) => () => {
     if (isCorrect) {
-      setScore(score + 1);
-      setAnswered(answered + 1);
+      quiz.setScore(quiz.score + 1);
+      quiz.setAnswered(quiz.answered + 1);
     } else {
-      setAnswered(answered + 1);
+      quiz.setAnswered(quiz.answered + 1);
     }
 
-    if (currentCount < data.results.length - 1) {
-      setCurrentCount(currentCount + 1);
+    if (!quiz.data) throw new Error("When is this called?");
+
+    if (quiz.currentCount < quiz.data.results.length - 1) {
+      quiz.setCurrentCount(quiz.currentCount + 1);
     } else {
+      handleTimerReset();
       setShowResult(true);
     }
   };
 
   const handleReset = () => {
     toggleShow();
-    setCurrentCount(0);
-    setScore(0);
-    setAnswered(0);
-    setData(null);
+    handleTimerReset();
+    quiz.setCurrentCount(0);
+    quiz.setScore(0);
+    quiz.setAnswered(0);
+    quiz.setData(null);
   };
 
   return showResult ? (
     <QuizResult
-      correct={score}
-      answered={answered}
-      incorrect={answered - score}
+      correct={quiz.score}
+      answered={quiz.answered}
+      incorrect={quiz.answered - quiz.score}
       reset={handleReset}
     />
   ) : (
     <>
       <p className="rounded-lg bg-gray-700 py-1 px-4 text-2xl font-bold tracking-wider text-green-400">
-        {minutes}m {seconds}s
+        {/* {timer.minutes}m {timer.seconds}s */}
+        {timer.minutes}m {timer.seconds}s
       </p>
       <div className="mt-4 flex max-w-[600px] flex-col rounded-lg bg-gray-600 py-10 px-4 text-center shadow-2xl sm:px-10">
-        <QuizQuestion count={currentCount + 1} question={question} />
+        <QuizQuestion count={quiz.currentCount + 1} question={question} />
         <div className="mt-6 flex items-center justify-center">
           <SVGDivider />
         </div>
@@ -116,7 +112,7 @@ export default function Quiz({ toggleShow }: { toggleShow: () => void }) {
           answers={[correct_answer, ...incorrect_answers]}
           correctAnswer={correct_answer}
           handleClick={handleClick}
-          currentCount={currentCount}
+          currentCount={quiz.currentCount}
         />
       </div>
     </>
